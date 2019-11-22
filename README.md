@@ -1,12 +1,12 @@
-# Webhook Proxy
+# Webhook Mailbox
 
-This project configures Amazon Web Services, in particular [API Gateway][gateway], [Simple Queue Service][sqs], and [Lambda][lambda], to create an API endpoint which places incoming requests into a queue.
+This project configures Amazon Web Services, in particular [API Gateway][gateway], [Simple Queue Service][sqs], and [Lambda][lambda], to create an API endpoint which places incoming requests into a queue ("mailbox").
 
 [gateway]: https://aws.amazon.com/api-gateway/
 [lambda]: https://aws.amazon.com/lambda/
 [sqs]: https://aws.amazon.com/sqs/
 
-Requests can popped off of this queue from behind a firewall and forwarded to an internal service, without exposing that service to the Internet.
+Requests can be popped off of this queue from behind a firewall and delivered to an internal service, without exposing that service to the Internet.
 
 
 # Install
@@ -30,8 +30,8 @@ First, configure a virtual environment and install dependencies:
 
 The `configure` subcommand will automatically provision the necessary AWS resources and return credentials and an HTTP endpoint URL: 
 
-    $ python webhook-proxy.py configure
-    Configured queue webhook-proxy-388cfb with the following credentials:
+    $ python webhook-mailbox.py configure
+    Configured queue webhook-mailbox-388cfb with the following credentials:
       AWS_ACCESS_KEY_ID=AKIATM5TRIWFWDM3I4GX
       AWS_SECRET_ACCESS_KEY=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
 
@@ -40,6 +40,7 @@ The `configure` subcommand will automatically provision the necessary AWS resour
 
 # Future
 
-It is possible the configuration could be done through [Terraform][] more robustly.
+It is possible the configuration could be done through [CloudFormation][] or [Terraform][] more robustly.
 
+[CloudFormation]: https://aws.amazon.com/cloudformation/
 [Terraform]: https://www.terraform.io/

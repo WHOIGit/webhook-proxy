@@ -14,7 +14,7 @@ import click
 
 # Functions for naming our AWS resources
 def create_queue_name():
-    return 'webhook-proxy-' + ''.join(random.choices('0123456789abcdef', k=6))
+    return 'webhook-mailbox-' + ''.join(random.choices('0123456789abcdef', k=6))
 
 def get_api_name(queue_name):
     return queue_name
@@ -228,7 +228,7 @@ def configure():
             uri=function_uri
         )
 
-    # Create a trigger allowing the integration to invoke the Lambda function
+    # Allow the integration to invoke the Lambda function
     lam.add_permission(
         FunctionName=function_name,
         StatementId=f'RestApiInvoke',
