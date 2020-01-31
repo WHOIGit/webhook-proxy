@@ -297,5 +297,31 @@ def unconfigure(queue_name):
     print('Deleted queue', queue_name)
 
 
+@cli.command()
+@click.argument('queue_name')
+@click.argument('forward_url')
+def watch(queue_name, forward_url):
+    print('Watching for messages queue', queue_name)
+
+    sqs = boto3.client('sqs')
+
+    # Get queue URL
+    response = sqs.get_queue_url(QueueName=queue_name)
+    queue_url = response['QueueUrl']
+
+    while True:
+        response = sqs.receive_message(
+            QueueUrl=queue_url,
+            AttributeNames=['SentTimestamp'],
+            MaxNumberOfMessages=1,
+            MessageAttributeNames=['All'],
+            WaitTimeSeconds=20  # recommended setting
+        )
+        for message in response.get('Messages', []):
+            print('Received message:')
+            print(message)
+            print()
+
+
 if __name__ == '__main__':
     cli()
