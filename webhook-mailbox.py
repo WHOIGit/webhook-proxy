@@ -77,7 +77,12 @@ def configure():
 
     # Create the queue
     sqs = boto3.client('sqs')
-    response = sqs.create_queue(QueueName=queue_name)
+    response = sqs.create_queue(
+        QueueName=f'{queue_name}.fifo',
+        Attributes={
+            'FifoQueue': 'true',
+        }
+    )
     queue_url = response['QueueUrl']
 
     # Get the queue's resource ARN
@@ -172,7 +177,8 @@ def configure():
                 Role=producer_role_arn,
                 Handler='main.lambda_handler',
                 Code={
-                    'ZipFile': zip_code('main', get_lambda_code(queue_name))
+                    'ZipFile': zip_code('main',
+                                        get_lambda_code(f'{queue_name}.fifo'))
                 }
             )
             function_arn = response['FunctionArn']
@@ -260,7 +266,7 @@ def unconfigure(queue_name):
 
     # Delete the queue itself
     sqs = boto3.client('sqs')
-    response = sqs.get_queue_url(QueueName=queue_name)
+    response = sqs.get_queue_url(QueueName=f'{queue_name}.fifo')
     sqs.delete_queue(QueueUrl=response['QueueUrl'])
 
     # Delete the Lambda function
