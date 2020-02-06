@@ -191,7 +191,7 @@ def configure():
     else:
         raise Exception('Timed out trying to create Lambda function')
 
-    
+
     # Create an API Gateway REST API
     gway = boto3.client('apigateway')
     response = gway.create_rest_api(name=api_name)
@@ -291,7 +291,7 @@ def unconfigure(queue_name):
             UserName=consumer_name,
             AccessKeyId=access_key['AccessKeyId']
         )
-    
+
     iam.delete_user_policy(UserName=consumer_name, PolicyName=consumer_name)
     iam.delete_user(UserName=consumer_name)
 
@@ -314,7 +314,7 @@ def watch(queue_name, forward_url):
     sqs = boto3.client('sqs')
 
     # Get queue URL
-    response = sqs.get_queue_url(QueueName=queue_name)
+    response = sqs.get_queue_url(QueueName=f'{queue_name}.fifo')
     queue_url = response['QueueUrl']
 
     while True:
