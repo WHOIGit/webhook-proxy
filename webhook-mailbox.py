@@ -5,11 +5,13 @@ import random
 import shlex
 import textwrap
 import time
+import traceback
 import zipfile
 
 import boto3
 import botocore.exceptions
 import click
+import requests
 
 
 # Functions for naming our AWS resources
@@ -318,9 +320,22 @@ def watch(queue_name, forward_url):
             WaitTimeSeconds=20  # recommended setting
         )
         for message in response.get('Messages', []):
-            print('Received message:')
-            print(message)
-            print()
+            try:
+                print('Processing message')
+                body = json.loads(message['Body'])
+                requests.request(
+                    body.get('httpMethod', 'GET'),
+                    forward_url,
+                    headers=body.get('headers', {}),
+                    params=body.get('queryStringParameters', {}),
+                    data=body.get('body', '')
+                )
+            except Exception as e:
+                print('Encountered an error:')
+                traceback.print_exc()
+                print('\nWhile processing this request:')
+                print(message)
+                print('\n\n', end='')
 
 
 if __name__ == '__main__':
