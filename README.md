@@ -73,6 +73,22 @@ Then, run the mailbox watcher with the corresponding queue name and the Jenkins 
       https://jenkins.local/generic-webhook-trigger/invoke
 
 
+# Docker
+
+A `Dockerfile` is provided for convenience.
+
+Note that currently `-it` is required, because otherwise the program will hang and be unresponsive to keyboard input. This is a bug.
+
+    docker run \
+      -it \
+      -e AWS_ACCESS_KEY_ID= \
+      -e AWS_SECRET_ACCESS_KEY= \
+      -e AWS_DEFAULT_REGION=us-east-1 \
+      -e WEBHOOK_QUEUE_NAME=webhook-mailbox-e05a69 \
+      -e WEBHOOK_FORWARD_URL=https://jenkins.local/generic-webhook-trigger/invoke \
+      whoi/webhook-mailbox
+
+
 # Future
 
 It is possible the configuration could be done through [CloudFormation][] or [Terraform][] more robustly.
