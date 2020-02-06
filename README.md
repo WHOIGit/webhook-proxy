@@ -38,6 +38,41 @@ The `configure` subcommand will automatically provision the necessary AWS resour
     URL: https://jofx96r5z4.execute-api.us-east-1.amazonaws.com/prod/
 
 
+# Watch
+
+The `watch` subcommand watches the queue. When a new message, it will issue a request to the given endpoint URL, copying the HTTP method, headers, URL parameters, and request body. The path is discarded.
+
+    AWS_ACCESS_KEY_ID= \
+    AWS_SECRET_ACCESS_KEY= \
+    python webhook-mailbox.py watch \
+      webhook-mailbox-e05a69 \
+      https://server.local/endpoint
+
+
+# Integration with Jenkins
+
+The [Generic Webhook Trigger][gwt] plugin for Jenkins can be used to set up an HTTP endpoint to trigger a build.
+
+[gwt]: https://plugins.jenkins.io/generic-webhook-trigger
+[gwt-examples]: https://github.com/jenkinsci/generic-webhook-trigger-plugin/tree/master/src/test/resources/org/jenkinsci/plugins/gwt/bdd
+
+Enable the trigger on your Jenkins project. It's a good idea to assign a token to it.
+
+On the repository server, the hook URL should look like:
+
+    https://xyzzy.execute-api.us-east-1.amazonaws.com/prod/?token=project-token
+
+For additional configuration, such as to set which branch to build, see [these examples][gwt-examples].
+
+Then, run the mailbox watcher with the corresponding queue name and the Jenkins trigger invocation URL:
+
+    AWS_ACCESS_KEY_ID= \
+    AWS_SECRET_ACCESS_KEY= \
+    python webhook-mailbox.py watch \
+      webhook-mailbox-e05a69 \
+      https://jenkins.local/generic-webhook-trigger/invoke
+
+
 # Future
 
 It is possible the configuration could be done through [CloudFormation][] or [Terraform][] more robustly.
