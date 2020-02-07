@@ -38,10 +38,10 @@ def get_lambda_code(queue_name):
     import json
 
     sqs = boto3.resource('sqs')
-    queue = sqs.get_queue_by_name(QueueName='{queue_name}')
+    queue = sqs.get_queue_by_name(QueueName='{queue_name}.fifo')
 
     def lambda_handler(event, context):
-        queue.send_message(MessageBody=json.dumps(event))
+        queue.send_message(MessageBody=json.dumps(event), MessageGroupId='x')
         response = {{
             'body': json.dumps({{ 'result': 'ok' }}),
             'headers': {{ 'Content-Type': 'application/json' }},
@@ -80,6 +80,7 @@ def configure():
     response = sqs.create_queue(
         QueueName=f'{queue_name}.fifo',
         Attributes={
+            'ContentBasedDeduplication': 'true',
             'FifoQueue': 'true',
         }
     )
@@ -177,8 +178,7 @@ def configure():
                 Role=producer_role_arn,
                 Handler='main.lambda_handler',
                 Code={
-                    'ZipFile': zip_code('main',
-                                        get_lambda_code(f'{queue_name}.fifo'))
+                    'ZipFile': zip_code('main', get_lambda_code(queue_name))
                 }
             )
             function_arn = response['FunctionArn']
