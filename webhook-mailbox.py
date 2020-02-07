@@ -327,7 +327,7 @@ def watch(queue_name, forward_url):
         )
         for message in response.get('Messages', []):
             try:
-                print('Processing message')
+                print('Processing message', message.get('MessageId', '???'))
                 body = json.loads(message['Body'])
                 requests.request(
                     body.get('httpMethod', 'GET'),
@@ -336,10 +336,22 @@ def watch(queue_name, forward_url):
                     params=body.get('queryStringParameters', {}),
                     data=body.get('body', '')
                 )
-            except Exception as e:
+            except:
                 print('Encountered an error:')
                 traceback.print_exc()
                 print('\nWhile processing this request:')
+                print(message)
+                print('\n\n', end='')
+
+            try:
+                sqs.delete_message(
+                    QueueUrl=queue_url,
+                    ReceiptHandle=message['ReceiptHandle'],
+                )
+            except:
+                print('Encountered an error:')
+                traceback.print_exc()
+                print('\nWhile deleting this request:')
                 print(message)
                 print('\n\n', end='')
 
